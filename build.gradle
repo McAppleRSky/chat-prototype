@@ -1,0 +1,77 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+}
+
+description = "redis chat"
+group 'rarus.chat'
+version '0.0.1-SNAPSHOT'
+sourceCompatibility = JavaVersion.VERSION_1_8
+compileJava   {
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+ext {
+    fingBugs_version = "3.0.2"
+//    lombok_version = '1.18.22'
+//    lang3_version = "3.12.0"
+//    mockito_version = "4.2.0"
+//    log4j_version = "2.17.0"
+//    jetty9_version = "9.4.44.v20210927"
+//    servlet3_version = "3.1.0"
+//    jackson_version = "2.13.1"
+//    junit58_version = "5.8.2"
+    boot_version = "2.6.2"
+    slf4j_version = "1.7.32"
+}
+
+dependencies {
+    compileOnly "com.google.code.findbugs:jsr305:$fingBugs_version"
+    implementation "org.springframework.boot:spring-boot-starter-parent:$boot_version"
+    implementation "org.springframework.boot:spring-boot-starter:$boot_version"
+
+//    compileOnly "org.projectlombok:lombok:$lombok_version"
+//    annotationProcessor "org.projectlombok:lombok:$lombok_version"
+//    implementation "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
+//    implementation "com.fasterxml.jackson.core:jackson-core:$jackson_version"
+//    implementation "com.fasterxml.jackson.core:jackson-annotations:$jackson_version"
+//    implementation "org.apache.commons:commons-lang3:$lang3_version"
+//    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit58_version"
+//    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit58_version"
+//    testImplementation "org.mockito:mockito-core:$mockito_version"
+//    implementation "org.eclipse.jetty:jetty-server:$jetty9_version"
+//    implementation "org.eclipse.jetty:jetty-webapp:$jetty9_version"
+    implementation "org.slf4j:slf4j-api:$slf4j_version"
+    implementation "org.slf4j:slf4j-simple:$slf4j_version"
+//    compileOnly "javax.servlet:javax.servlet-api:$servlet3_version"
+//    implementation "org.eclipse.jetty.websocket:websocket-servlet:$jetty9_version"
+//    implementation "org.eclipse.jetty.websocket:websocket-server:$jetty9_version"
+    implementation 'redis.clients:jedis:4.0.0'
+}
+
+sourceSets {
+    main {
+        resources {
+            exclude '*.zip'
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+}
