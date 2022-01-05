@@ -1,4 +1,4 @@
-package rarus.chat.component;
+package rarus.chat.server.main.config;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,21 +1,24 @@
-package rarus.chat._3_service;
+package rarus.chat.server._3_service;
 
-import rarus.chat._2_socket.ClientHandler;
-import rarus.chat.main.Main;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import rarus.chat.server._2_createConnection.ConnectionHandler;
 
-import java.io.IOException;
-import java.net.ServerSocket;
+import java.io.*;
 import java.net.Socket;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ClientServiceImpl implements ClientService {
+public class ServerClientServiceImpl implements ServerClientService {
+
+    private static final Logger LOGGER = LogManager.getLogger(ServerClientServiceImpl.class);
 
     // список клиентов, которые будут подключаться к серверу
 //    private ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
-    private Set<ClientHandler> clients = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private Set<ConnectionHandler> clients = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /*public ClientServiceImpl() {
         // порт, который будет прослушивать наш сервер
@@ -56,29 +59,70 @@ public class ClientServiceImpl implements ClientService {
             }
         }
     }*/
+private void testRequestResponse(Socket clientSocket){
+    try ( Scanner inMessage = new Scanner( clientSocket.getInputStream() ) ) {
+        try ( PrintWriter outMessage = new PrintWriter(clientSocket.getOutputStream(), true) ) {
+            LOGGER.info("Created socket's input, output streams");
+/*                ServerComponent serverComponent = (ServerComponent) Main.context.get(ServerComponent.class);
+                serverComponent.notify();*/
+            while (true) {
+                while (inMessage.hasNext()){
+                    outMessage.println(inMessage.next());
+                }
+            }
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    LOGGER.info("Created socket's input, output streams");
+}
+    public ServerClientServiceImpl(Socket clientSocket)
+    {
+testRequestResponse(clientSocket);
 
-    public ClientServiceImpl(Socket clientSocket) {
-        ClientHandler client = new ClientHandler(clientSocket, this);
+//        Scanner inMessage = null;
+        /*try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+            try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
+                String msg = in.readLine();
+                out.println("resp " + msg);
+            } catch (IOException e) {
+                e.printStackTrace();}}*/
+
+        /*InputStream
+                    inputStream = clientSocket.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+        /*while (true){
+            try ( Scanner inMessage = new Scanner(clientSocket.getInputStream()) ) {
+                if(inMessage.hasNext()){
+                    String receivingData = inMessage.nextLine();
+                    System.out.println(receivingData);
+                } } }*/
+
+        /*Main.context.get(ServerComponent.class)
+                .notify();
+        ServerClientHandler client = new ServerClientHandler(clientSocket, this);
         clients.add(client);
         // каждое подключение клиента обрабатываем в новом потоке
 //        new Thread(client).start();
-        client.run();
+        client.run();*/
     }
 
     @Override
     public void sendMessageToAllClients(String msg) {
-        for (ClientHandler o : clients) {
+        for (ConnectionHandler o : clients) {
             o.sendMsg(msg);
         }
     }
 
     @Override
-    public void addClient(ClientHandler client) {
+    public void addClient(ConnectionHandler client) {
         clients.add(client);
     }
 
     @Override
-    public void removeClient(ClientHandler client) {
+    public void removeClient(ConnectionHandler client) {
         clients.remove(client);
     }
 
@@ -90,7 +134,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public Set<String> clientsNames() {
         Set<String> names = new HashSet<>();
-        for (ClientHandler socket : clients) {
+        for (ConnectionHandler socket : clients) {
             names.add(socket.getClientName());
         }
         return names;

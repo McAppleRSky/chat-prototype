@@ -1,4 +1,4 @@
-package rarus.chat.main;
+package rarus.chat.server.main;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -9,8 +9,8 @@ import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
 import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
 import org.apache.logging.log4j.core.config.builder.api.RootLoggerComponentBuilder;
 import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
-import rarus.chat.component.ConfigComponent;
-import rarus.chat.component.ConfigComponentImpl;
+import rarus.chat.server.main.config.ConfigComponent;
+import rarus.chat.server.main.config.ConfigComponentImpl;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -21,7 +21,7 @@ import java.time.Duration;
 import java.util.Properties;
 
 @SuppressWarnings("deprecation")
-public class MainConfiguration {
+class MainConfiguration {
 
     protected static Logger configureLogger(Class c){
         ConfigurationBuilder<BuiltConfiguration> cfgBuilder = ConfigurationBuilderFactory.newConfigurationBuilder();
@@ -48,11 +48,11 @@ public class MainConfiguration {
                         .newAppenderRef("fileAppender")
                         .addAttribute("level", Level.INFO))*/
                 ;
-        LoggerContext context = Configurator
+        LoggerContext loggerContext = Configurator
                 .initialize(cfgBuilder
                         .add(rootLoggerBuilder)
                         .build());
-        return context.getLogger(c.getName());
+        return loggerContext.getLogger(c.getName());
     }
 
     protected static ConfigComponent configureContext() {
@@ -65,6 +65,7 @@ public class MainConfiguration {
             result.setProperty("redis-port", properties.getProperty("redis-port"));
             result.setProperty("redis-timeout", properties.getProperty("redis-timeout"));
             result.setProperty("chat-room", properties.getProperty("chat-room"));
+            result.setProperty("date-time-format", properties.getProperty("date-time-format"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException ex) {

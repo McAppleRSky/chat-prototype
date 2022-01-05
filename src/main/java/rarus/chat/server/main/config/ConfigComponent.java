@@ -1,4 +1,4 @@
-package rarus.chat.component;
+package rarus.chat.server.main.config;
 
 public interface ConfigComponent {
 

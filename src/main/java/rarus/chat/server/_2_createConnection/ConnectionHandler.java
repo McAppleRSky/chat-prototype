@@ -1,7 +1,7 @@
-package rarus.chat._2_socket;
+package rarus.chat.server._2_createConnection;
 
-import rarus.chat._3_service.ClientService;
-import rarus.chat._3_service.ClientServiceImpl;
+import rarus.chat.server._2_createConnection.creator.Connection;
+import rarus.chat.server._3_service.ServerClientService;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -9,14 +9,10 @@ import java.net.Socket;
 import java.util.Scanner;
 
 // реализуем интерфейс Runnable, который позволяет работать с потоками
-public class ClientHandler //implements Runnable
-                            {
+public class ConnectionHandler implements Connection, Runnable{
+    private Integer session;
     // экземпляр нашего сервера
-    private ClientService chatService;
-    // исходящее сообщение
-    private PrintWriter outMessage;
-    // входящее собщение
-    private Scanner inMessage;
+    private ServerClientService chatService;
     private static final String HOST = "localhost";
     private static final int PORT = 3443;
     // клиентский сокет
@@ -24,19 +20,35 @@ public class ClientHandler //implements Runnable
     // количество клиента в чате, статичное поле
 //    private static int clients_count = 0;
     private String clientName;
+    // исходящее сообщение
+    private PrintWriter outMessage;
+    // входящее собщение
+    private Scanner inMessage;
+
+    @Override public PrintWriter getOutMessage() {
+        return outMessage;
+    }
+    @Override public Scanner getInMessage() {
+        return inMessage;
+    }
 
     // конструктор, который принимает клиентский сокет и сервер
-    public ClientHandler(Socket socket, ClientServiceImpl chatService) {
+    public ConnectionHandler(Socket clientSocket//, ServerClientServiceImpl chatService
+                                )
+    {
         try {
 //            clients_count++;
             this.chatService = chatService;
-            this.clientSocket = socket;
-            this.outMessage = new PrintWriter(socket.getOutputStream());
-            this.inMessage = new Scanner(socket.getInputStream());
+            this.clientSocket = clientSocket;
+            this.outMessage = new PrintWriter(clientSocket.getOutputStream());
+            this.inMessage = new Scanner(clientSocket.getInputStream());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
+
+//    public ConnectionHandler() {}
+
     // Переопределяем метод run(), который вызывается когда
     // мы вызываем new Thread(client).start();
 //    @Override
