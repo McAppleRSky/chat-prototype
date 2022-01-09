@@ -1,12 +1,10 @@
-package rarus.chat.model;
+package rarus.chat.server.backEnd.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Getter @Setter
 @AllArgsConstructor

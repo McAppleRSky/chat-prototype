@@ -3,8 +3,8 @@ package rarus.chat.server.main;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import rarus.chat.model.Message;
 import rarus.chat.server.main.config.ConfigComponent;
+import rarus.chat.server.backEnd.model.Message;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,10 +14,15 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.junit.jupiter.api.Assertions.*;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@SuppressWarnings( "deprecation" )
 public class TestChatStart {
+
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     public void serverStartingTest() {
@@ -26,27 +31,24 @@ public class TestChatStart {
         });
         threadServer.start();
 
-        String nameValue = null, messageValue = null;
+        String nameValue = null, requestMessage = null;
         try {
             nameValue = randomAlphabetic(3);
-            ObjectMapper objectMapper = new ObjectMapper();
-            messageValue = objectMapper.writeValueAsString(new Message(nameValue, "", ""));
+            requestMessage = objectMapper.writeValueAsString(new Message(nameValue, "", ""));
+            assertNotNull(requestMessage);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
-        String finalMessageValue = messageValue;
-        String finalNameValue = nameValue;
-//        try (Socket clientSocket = new Socket("localhost", 3443)) {
         try (Socket clientSocket = new Socket(InetAddress.getByName(null), 3443)) {
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
                 try ( BufferedReader in = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()) ) ) {
-//                    System.out.println("test client running");
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    out.println(finalMessageValue);
-                    String response = in.readLine();
-                    Message message = objectMapper.readValue(response, Message.class);
-                    assertEquals(finalNameValue, message.getName());
+                    out.println(requestMessage);
+                    System.out.println("Send " + requestMessage);
+                    String responseMessage = in.readLine();
+                    assertNotNull(responseMessage);
+                    Message message = objectMapper.readValue(responseMessage, Message.class);
+                    assertEquals(nameValue, message.getName());
                     System.out.println(message.getName());
                 }
             }
